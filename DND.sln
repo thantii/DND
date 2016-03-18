@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MAP_PNG", "MAP_PNG\MAP_PNG.vcproj", "{09213F34-DA37-4415-B271-F0FFA85286F5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MAPRAN2TXT", "MAPRAN2TXT\MAPRAN2TXT.vcproj", "{A29040DB-6CBD-4C80-8261-C5D728DD88E2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09213F34-DA37-4415-B271-F0FFA85286F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09213F34-DA37-4415-B271-F0FFA85286F5}.Debug|Win32.Build.0 = Debug|Win32
+		{09213F34-DA37-4415-B271-F0FFA85286F5}.Release|Win32.ActiveCfg = Release|Win32
+		{09213F34-DA37-4415-B271-F0FFA85286F5}.Release|Win32.Build.0 = Release|Win32
+		{A29040DB-6CBD-4C80-8261-C5D728DD88E2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A29040DB-6CBD-4C80-8261-C5D728DD88E2}.Debug|Win32.Build.0 = Debug|Win32
+		{A29040DB-6CBD-4C80-8261-C5D728DD88E2}.Release|Win32.ActiveCfg = Release|Win32
+		{A29040DB-6CBD-4C80-8261-C5D728DD88E2}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

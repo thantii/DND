@@ -1,0 +1,200 @@
+#==============================================================================
+# ■ Scene_Title
+#------------------------------------------------------------------------------
+# 　处理标题画面的类。
+#==============================================================================
+
+class Scene_Title
+  #--------------------------------------------------------------------------
+  # ● 主处理
+  #--------------------------------------------------------------------------
+  def main
+    $data_system        = load_data("Data/System.rxdata")
+    $data_tilesets      = load_data("Data/Tilesets.rxdata")
+    # 生成系统对像
+    $game_system = Game_System.new
+    # 生成标题图形
+    @sprite = Sprite.new
+    @sprite.bitmap = RPG::Cache.title($data_system.title_name)
+    # 生成命令窗口
+    s1 = "单个导入(001存在->创建->导入)"
+    s2 = "全部导出"
+    s3 = "全部导入(危险动作)"
+    s4 = "退出"
+    
+    @command_window = Window_Command.new(320, [s1, s2, s3, s4])
+    @command_window.back_opacity = 160
+    @command_window.x = 320 - @command_window.width / 2
+    @command_window.y = 288
+    # 执行过渡
+    Graphics.transition
+    # 主循环
+    loop do
+      # 刷新游戏画面
+      Graphics.update
+      # 刷新输入信息
+      Input.update
+      # 刷新画面
+      update
+      # 如果画面被切换就中断循环
+      if $scene != self
+        break
+      end
+    end
+    # 装备过渡
+    Graphics.freeze
+    # 释放命令窗口
+    @command_window.dispose
+    # 释放标题图形
+    @sprite.bitmap.dispose
+    @sprite.dispose
+  end
+  #--------------------------------------------------------------------------
+  # ● 刷新画面
+  #--------------------------------------------------------------------------
+  def update
+    # 刷新命令窗口
+    @command_window.update
+    # 按下 C 键的情况下
+    if Input.trigger?(Input::C)
+      # 命令窗口的光标位置的分支
+      case @command_window.index
+      when 0  # 单个导入
+        command_import
+      when 1  # 全部导出
+        command_export_all
+      when 2  # 全部导入
+        command_import_all
+      when 3  # 退出
+        command_shutdown
+      end
+    end
+  end
+  #--------------------------------------------------------------------------
+  # ● 命令 : 单个导入
+  #--------------------------------------------------------------------------
+  def command_import
+    # 创建Maps目录
+    Dir.mkdir("Maps") unless Dir["*"].include?("Maps")
+  
+    # 加载需要的资源
+    mapinfos = load_data("Data/MapInfos.rxdata")
+    data_tilesets = load_data("Data/Tilesets.rxdata")
+    
+    # 先加载头一个地图，此地图为默认模板，不许删除
+    map = load_data("Data/Map001.rxdata")
+    
+    # 读取需要导入的地图txt
+    file = open("Maps/import.txt","r")
+    
+    # 第一行是Tile
+    map.tileset_id = file.gets().to_i()
+    
+    # 第二行是Auto_Tile
+    file.gets()
+    
+    # 第三行是宽和高
+    map_size = file.gets().split(",")
+    map.width = map_size[0].to_i()
+    map.height = map_size[1].to_i()
+    
+    map.data.resize(map.width, map.height, 3)
+    
+    # 所有的块都读出来
+    for l in 0...2
+      for h in 0...map.height
+        tiles = file.gets().split(",")
+        for w in 0...map.width
+          map.data[w,h,l] = tiles[w].to_i()
+        end
+      end
+    end
+    file.close()
+    
+    # 存图
+    save_data(map, sprintf("Data/Map%03d.rxdata",mapinfos.length))
+    Graphics.update
+    
+    p "done"
+  end
+  #--------------------------------------------------------------------------
+  # ● 命令 : 全部导出
+  #--------------------------------------------------------------------------
+  def command_export_all
+    # 创建Maps目录
+    Dir.mkdir("Maps") unless Dir["*"].include?("Maps")
+  
+    # 加载需要的资源
+    mapinfos = load_data("Data/MapInfos.rxdata")
+    data_tilesets = load_data("Data/Tilesets.rxdata")
+
+    for map_id in 0...mapinfos.length
+      map = load_data(sprintf("Data/Map%03d.rxdata", map_id + 1))
+      tileset = data_tilesets[map.tileset_id] 
+
+      # 只有0层图有意义
+      text = sprintf("Maps/Map%03d.txt",map_id + 1)
+      file = open(text,"w")
+
+      # 写tile
+      file.write(map.tileset_id)
+      file.write("\n")
+      # 写autotile
+      file.write(tileset.tileset_name)
+      file.write(",")
+      file.write(tileset.autotile_names[0])
+      file.write(",")
+      file.write(tileset.autotile_names[1])
+      file.write(",")
+      file.write(tileset.autotile_names[2])
+      file.write(",")
+      file.write(tileset.autotile_names[3])
+      file.write(",")
+      file.write(tileset.autotile_names[4])
+      file.write(",")
+      file.write(tileset.autotile_names[5])
+      file.write(",")
+      file.write(tileset.autotile_names[6])
+      file.write("\n")
+
+      # 写宽和高
+      file.write(map.width)
+      file.write(",")
+      file.write(map.height)
+      file.write("\n")
+      
+      for mapid in 0...3
+        for h in 0...map.height
+          for w in 0...map.width
+            tile_id = map.data[w,h,mapid]
+            if tile_id.nil? or tile_id == 0
+              file.write("000,")
+            else
+              file.write(sprintf("%3d",tile_id)+",")
+            end
+          end
+          file.write("\n")
+        end
+      end
+      file.close
+    end
+    Graphics.update
+    
+    p "done"
+  end
+  #--------------------------------------------------------------------------
+  # ● 命令 : 全部导入
+  #--------------------------------------------------------------------------
+  def command_import_all
+  end
+  #--------------------------------------------------------------------------
+  # ● 命令 : 退出
+  #--------------------------------------------------------------------------
+  def command_shutdown
+    # 退出
+    $scene = nil
+  end
+  #--------------------------------------------------------------------------
+  # ● 战斗测试
+  #--------------------------------------------------------------------------
+end
